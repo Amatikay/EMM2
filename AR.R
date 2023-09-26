@@ -15,17 +15,19 @@ AR<-function(theta,n){ # Вариация процесса, с передава�
 }
 
 Estimation_MNK <- function(x) {
-    n <- length(x)
-    theta <- 0 # Пусть для начального приближения theta равна нулю
+  n <- length(x)
+  numerator <- 0
+  denominator <- 0
 
-    for (i in 2:n) {
-        theta <- theta + (x[i] * x[i-1]) / (x[i-1] * x[i-1])
-    }
+  for (i in 2:n) {
+    numerator <- numerator + x[i] * x[i-1]
+    denominator <- denominator + x[i-1] * x[i-1]
+  }
 
-    return(theta)
+  theta <- numerator / denominator
+
+  return(theta)
 }
-
-
 
 #######################################################
 #                      Задания                        #
@@ -69,7 +71,7 @@ plot.ts(x)
 
 ############ 2 ##########
 theta <- c(theta1)
-n<-10
+n<-100
 
 x<- AR(theta,n)
 
