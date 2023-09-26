@@ -52,33 +52,42 @@ theta3 <- rnorm(1, mean=2, sd=1)
 
 # 1.1
 theta <- c(theta1)
-n<-10
+n<-1000
 x<- AR(theta,n)
+png(filename="theta_lower_1.png")
 plot.ts(x)
+dev.off()
 
 # 1.2
 theta <- c(theta2)
-n<-10
+n<-1000
 x<- AR(theta,n)
+png(filename="theta_equal_1.png")
 plot.ts(x)
+dev.off()
 
 # 1.3
 
 theta <- c(theta3)
-n<-10
+n<-100
 x<- AR(theta,n)
+png(filename="theta_upper_1.png")
+print(x)
 plot.ts(x)
+dev.off()
 
 ############ 2 ##########
-theta <- c(theta1)
-n<-100
 
+theta <- c(theta1)
+n<-1000
 x<- AR(theta,n)
 
 estimated_theta <- Estimation_MNK(x)
 
 print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta))
+
 ############ 3 ##########
+
 ############ 4 ##########
 ############ 5 ##########
 ############ 6 ##########
