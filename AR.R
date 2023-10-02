@@ -44,10 +44,20 @@ Estimation_MLE <- function(x) {
   return(theta)
 }
 
+Generate_vector_thetha_stacionary <- function(){
+  theta <- c(rnorm(1),rnorm(1))
+  while(all(abs(polyroot(c(1, -theta[1], -theta[2]))) < 1)){
+    theta <- c(rnorm(1),rnorm(1))
+  }
+  return( theta )
+} 
+
+
+
 #######################################################
 #                      Задания                        #
 #######################################################
-par(mfrow = c(2, 2)) # Разбил окно вывод графков на сетку 2*2
+par(mfrow = c(2, 3)) # Разбил окно вывод графков на сетку 2*2
 ############ 1 ##########
 
 
@@ -143,4 +153,9 @@ estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
 plot(x, type = 'b', main = "Динамика оценок от размера выборки", xlab = "I", ylab = "Estimation_MNK", pch = 1)
 # dev.off()
 ############ 5 ##########
+
+theta <- Generate_vector_thetha_stacionary()
+n <- 100
+x <- AR(theta,n)
+plot.ts(x, main = "Устойчивый AR(2)")
 ############ 6 ##########
