@@ -47,7 +47,7 @@ Estimation_MLE <- function(x) {
 #######################################################
 #                      Задания                        #
 #######################################################
-
+par(mfrow = c(2, 2)) # Разбил окно вывод графков на сетку 2*2
 ############ 1 ##########
 
 
@@ -67,33 +67,33 @@ theta3 <- rnorm(1, mean=2, sd=1)
 
 # 1.1
 theta <- c(theta1)
-n<-1000
+n<-100
 x<- AR(theta,n)
-png(filename="./AR_Plots/theta_lower_1.png")
-plot.ts(x)
-dev.off()
+# png(filename="./AR_Plots/theta_lower_1.png")
+plot.ts(x, main = "thetha < 1")
+# dev.off()
 
 # 1.2
 theta <- c(theta2)
-n <-1000
+n <-100
 x <- AR(theta,n)
-png(filename="./AR_Plots/theta_equal_1.png")
-plot.ts(x)
-dev.off()
+# png(filename="./AR_Plots/theta_equal_1.png")
+plot.ts(x, main = "thetha = 1")
+# dev.off()
 
 # 1.3
 
 theta <- c(theta3)
 n <-100
 x <- AR(theta,n)
-png(filename="./AR_Plots/theta_upper_1.png")
-plot.ts(x)
-dev.off()
+# png(filename="./AR_Plots/theta_upper_1.png")
+plot.ts(x, main = "thetha > 1")
+# dev.off()
 
 ############ 2 ##########
 #Оценка МНК
 theta <- c(theta1)
-n <-1000
+n <-100
 x <- AR(theta,n)
 
 estimated_theta_mnk <- Estimation_MNK(x)
@@ -105,9 +105,10 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk))
 
 #
 # В случае гауссовского шума МНК и ММП выглядят одинаково.
+# В выводе оценки будут разные потому, что данные заново генерируются.
 #
 theta <- c(theta1)
-n <-1000
+n <-100
 x <- AR(theta,n)
 
 estimated_theta_mle <- Estimation_MLE(x)
@@ -138,8 +139,8 @@ for (i in 11:n){
 estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
 
 
-png(filename="./AR_Plots/Estimation_MNK_from_11_to_1000.png")
-plot(x, type = 'b', main = "Dynamics of estimates relative to sample size", xlab = "I", ylab = "Estimation_MNK", pch = 1)
-dev.off()
+#png(filename="./AR_Plots/Estimation_MNK_from_11_to_1000.png")
+plot(x, type = 'b', main = "Динамика оценок от размера выборки", xlab = "I", ylab = "Estimation_MNK", pch = 1)
+# dev.off()
 ############ 5 ##########
 ############ 6 ##########
