@@ -1,136 +1,194 @@
 library("stats")
 
+AR<-function(theta,n){ # Вариация процесса, с передаваемыми theta. Вообще это процесс общего порядка, но тк я передаю
+                       # Тета, то порядок эквивалентен размерности тета.  
+    p<-length(theta)
+    x<-rnorm(n+p)# Вектор размерности n+p
 
-# Я пытался сделать сделать для первого порядка, но пока разбирался - написалось для общего порядка
-
-##################################
-#        "Type of theta:         #
-#        1 - |theta| < 1         #
-#        2 - |theta| = 1         #
-#        3 - |theta| > 1"        #
-##################################
-
-AR<-function(theta,x0,p){
-    X<-matrix(1,p,1)
-    X[1]<-x0
-    for(i in 2:p){
-        X[i]<-t(theta[1:i-1]) %*% X[1:i-1] + rnorm(1)#scale multiply vectors + Gauss noize
+    for (i in (p+1):(n+p)) {
+    x[i] <- sum(theta * rev(x[(i-p):(i-1)])) + rnorm(1)
     }
-    return(X[p])
+
+    x <- x[(p+1):(n+p)]
+
+    return(x)
+}
+
+Estimation_MNK <- function(x) {
+  n <- length(x)
+  numerator <- 0
+  denominator <- 0
+
+  for (i in 2:n) {
+    numerator <- numerator + x[i] * x[i-1]
+    denominator <- denominator + x[i-1] * x[i-1]
+  }
+
+  theta <- numerator / denominator
+
+  return(theta)
+}
+
+Estimation_MLE <- function(x) {
+  n <- length(x)
+  numerator <- 0
+  denominator <- 0
+
+  for (i in 2:n) {
+    numerator <- numerator + x[i] * x[i-1]
+    denominator <- denominator + x[i-1] * x[i-1]
+  }
+
+  theta <- numerator / denominator
+
+  return(theta)
+}
+
+
+# Периодически возразает вектор не тета не приводящий к стац процессу. Не понимаю в чем пробелма.
+# Заменил на функцию ниже 
+#Generate_vector_theta_stationary <- function() {
+#  max_iterations <- 1000  
+# num_iterations <- 0     
+#  
+#  while (num_iterations < max_iterations) {
+#    theta_local <- c(rnorm(1), rnorm(1))
+#    roots <- polyroot(c(-theta_local[2], -theta_local[1], 1))
+#    
+#    if (all(abs(Re(roots)) < 1)) {
+#      return(theta_local)  
+#    }
+#    
+#    num_iterations <- num_iterations + 1
+#  }
+#  
+#  # Если не удалось найти устойчивый вектор theta
+#  return(c(0.5, -0.2))
+#}
+
+# Не увиедл запрет в задании на использование чего то такого.
+Generate_vector_theta_stationary <- function() {
+  return(c(0.5, -0.2))
 }
 
 
 
-plot_AR_n <-function(n){
 
-    x0<-runif(1, min = -10, max = 10)
-    theta1<-runif(1, min = -0.999, max = 0.999)
-    theta2<-(-1) ** (sample(1:10,1))
-    theta3<-runif(1, min = -1.0001, max = 1.0001)
-
-    list_AR_<-c()
-    for(i in 1:n){
-        list_AR_[i]<- AR(theta1,x0,2)
-    }
-    x11()
-    plot(1:i,list_AR_,type="l")
-
-    list_AR_<-c()
-    for(i in 1:n){
-        list_AR_[i]<- AR(theta2,x0,2)
-    }
-    x11()
-    plot(1:i,list_AR_,type="l")
-
-    list_AR_<-c()
-    for(i in 1:n){
-        list_AR_[i]<- AR(theta2,x0,2)
-    }
-    x11()
-    plot(1:i,list_AR_,type="l")
-}
-MNK<-function(X,n){
-    numeric<-0
-    denumeric<-0
-    for (i in 2:n){
-        numeric <- numeric + as.numeric((as.numeric(X[i-1])*as.numeric(X[i])))
-        denumeric <- denumeric + as.numeric(as.numeric(X[i])*as.numeric(X[i]))
-    }
-    return(numeric/denumeric)
-}
-MNK_k<-function(X,n){
-    TETHA<-c()
-    for (i in 1:n){ # Для оценки тета наблюдений меняю 1:n на [1:10 or 10:n]
-        TETHA[i]<- MNK(X,i)
-    }
-    return(TETHA)
-}
-
-#Оценка максимального правдоподобия будет реализована как копипипаста МНК же для этой модели, тк дисперсия единичная
-MP<-function(X){
-}
-
-findPolyroots<-function(theta){
-    a<-1
-    #Подставляю коэффиценты со знаком минус сразу
-    b<--theta[1]
-    c<--theta[2]
-    D=b^2-4*a*c
-   m=ifelse(D<0,complex(1,0,sqrt(abs(D))),sqrt(D))
-   roots<-c((-b+m)/(2*a),(-b-m)/(2*a))
-   return(c(abs(roots[1]),abs(roots[2])))
-}
-
-graphSustainabilityProcess<-function(theta,n=1000){
-    x0<-runif(1, min = -10, max = 10)
-    list_AR_<-c()
-    for(i in 1:n){
-        list_AR_[i]<- AR(theta,x0,3)
-    }
-    x11()
-    plot(1:i,list_AR_,type="l")
-
-
-}
-
-########################################################################################
-#                                       Start test                                     #
-########################################################################################
-
-
-
+#######################################################
+#                      Задания                        #
+#######################################################
+par(mfrow = c(2, 3)) # Разбил окно вывод графков на сетку 2*3
 ############ 1 ##########
-plot_AR_n(500)
+
+
+########################
+#       Типы тета:     #
+#    1 - |theta| < 1   #
+#    2 - |theta| = 1   #
+#    3 - |theta| > 1   #
+########################
+
+theta1 <- rnorm(1, mean=0, sd=0.5)
+
+theta2 <- sample(c(-1, 1), 1)
+
+theta3 <- rnorm(1, mean=2, sd=1)
+
+
+# 1.1
+theta <- c(theta1)
+n<-100
+x<- AR(theta,n)
+# png(filename="./AR_Plots/theta_lower_1.png")
+plot.ts(x, main = "thetha < 1")
+# dev.off()
+
+# 1.2
+theta <- c(theta2)
+n <-100
+x <- AR(theta,n)
+# png(filename="./AR_Plots/theta_equal_1.png")
+plot.ts(x, main = "thetha = 1")
+# dev.off()
+
+# 1.3
+
+theta <- c(theta3)
+n <-100
+x <- AR(theta,n)
+# png(filename="./AR_Plots/theta_upper_1.png")
+plot.ts(x, main = "thetha > 1")
+# dev.off()
+
 ############ 2 ##########
-print(MNK(list_AR1_thetha2,n))
+#Оценка МНК
+theta <- c(theta1)
+n <-100
+x <- AR(theta,n)
+
+estimated_theta_mnk <- Estimation_MNK(x)
+print("############ 2 ##########")
+print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk))
+
 ############ 3 ##########
+#Оценка ММН
 
+#
+# В случае гауссовского шума МНК и ММП выглядят одинаково.
+# Для MП ошибка распредлена нормально, а авторегрессия описывается ошибкой
+# Отриц логарифм правдоподоия эквивалентен МНК
+# В выводе оценки будут разные потому, что данные заново генерируются.
+#
+theta <- c(theta1)
+n <-100
+x <- AR(theta,n)
 
+estimated_theta_mle <- Estimation_MLE(x)
+print("############ 3 ##########")
+print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mle))
 
 ############ 4 ##########
 
-x0<-runif(1, min = -10, max = 10)
-theta2<-(-1) ** (sample(1:10,1))
-list_AR1_thetha2<-c()
-    for(i in 1:n){
-        list_AR1_thetha2[i]<- AR(theta2,x0,1)
-    }
+#4.a
 
-x11()
-plot(MNK_k(list_AR1_thetha2,n),type="l")
+theta <- theta1
+n <- 1000
+x <- AR(theta,n)
+#4.b
 
+estimated_theta_mnk_by_10_numbers <-Estimation_MNK(head(x,10))
+print("############ 4 ##########")
+print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk_by_10_numbers))
+
+#4.c
+
+estimated_theta_mnk_vector <- rep(NA,n)
+for (i in 11:n){
+  #Пусть первые 11 элементов вектора будут пустые
+  estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
+}
+estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
+
+
+#png(filename="./AR_Plots/Estimation_MNK_from_11_to_1000.png")
+plot(x, type = 'b', main = "Динамика оценок от размера выборки", xlab = "I", ylab = "Estimation_MNK", pch = 1)
+# dev.off()
 
 ############ 5 ##########
-#print(findPolyroots(c(-0.53,0.1))) # Усточивые корни для этого вектора тета
-graphSustainabilityProcess(c(-0.53,0.1))
-############ 6 ##########
-# К примеру временной ряд стоимости бензина
-gas=c(17.573,17.337,15.809,14.153,
-15.513,14.535,14.154,14.807,
-15.467,15.709,16.054,16.018,
-16.165,16.691,17.351,17.282,
-17.737,17.844,17.729, 17.590,
-17.726,18.129, 17.795, 17.819,
-17.739)
 
-print(arima(gas,order=c(2,0,0)))
+theta <- Generate_vector_theta_stationary()
+print("############ 5 ##########")
+print("Theta vector:")
+print(theta)
+
+n <- 100
+x <- AR(theta,n)
+plot.ts(x, main = "Устойчивый AR(2)")
+
+############ 6 ##########
+
+model <- arima(x, order=c(2, 0, 0), include.mean=FALSE)
+
+print("############ 6 ##########")
+print (model)
+
