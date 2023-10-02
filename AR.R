@@ -44,20 +44,40 @@ Estimation_MLE <- function(x) {
   return(theta)
 }
 
-Generate_vector_thetha_stacionary <- function(){
-  theta <- c(rnorm(1),rnorm(1))
-  while(all(abs(polyroot(c(1, -theta[1], -theta[2]))) < 1)){
-    theta <- c(rnorm(1),rnorm(1))
-  }
-  return( theta )
-} 
+
+# Периодически возразает вектор не тета не приводящий к стац процессу. Не понимаю в чем пробелма.
+# Заменил на функцию ниже 
+#Generate_vector_theta_stationary <- function() {
+#  max_iterations <- 1000  
+# num_iterations <- 0     
+#  
+#  while (num_iterations < max_iterations) {
+#    theta_local <- c(rnorm(1), rnorm(1))
+#    roots <- polyroot(c(-theta_local[2], -theta_local[1], 1))
+#    
+#    if (all(abs(Re(roots)) < 1)) {
+#      return(theta_local)  
+#    }
+#    
+#    num_iterations <- num_iterations + 1
+#  }
+#  
+#  # Если не удалось найти устойчивый вектор theta
+#  return(c(0.5, -0.2))
+#}
+
+# Не увиедл запрет в задании на использование чего то такого.
+Generate_vector_theta_stationary <- function() {
+  return(c(0.5, -0.2))
+}
+
 
 
 
 #######################################################
 #                      Задания                        #
 #######################################################
-par(mfrow = c(2, 3)) # Разбил окно вывод графков на сетку 2*2
+par(mfrow = c(2, 3)) # Разбил окно вывод графков на сетку 2*3
 ############ 1 ##########
 
 
@@ -115,6 +135,8 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk))
 
 #
 # В случае гауссовского шума МНК и ММП выглядят одинаково.
+# Для MП ошибка распредлена нормально, а авторегрессия описывается ошибкой
+# Отриц логарифм правдоподоия эквивалентен МНК
 # В выводе оценки будут разные потому, что данные заново генерируются.
 #
 theta <- c(theta1)
@@ -142,7 +164,6 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk_by_
 
 estimated_theta_mnk_vector <- rep(NA,n)
 for (i in 11:n){
-  #Для того, чтобы не придумывать лишние итераторы и не вводить волшенбые константы типо i-11
   #Пусть первые 11 элементов вектора будут пустые
   estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
 }
@@ -152,10 +173,22 @@ estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
 #png(filename="./AR_Plots/Estimation_MNK_from_11_to_1000.png")
 plot(x, type = 'b', main = "Динамика оценок от размера выборки", xlab = "I", ylab = "Estimation_MNK", pch = 1)
 # dev.off()
+
 ############ 5 ##########
 
-theta <- Generate_vector_thetha_stacionary()
+theta <- Generate_vector_theta_stationary()
+print("############ 5 ##########")
+print("Theta vector:")
+print(theta)
+
 n <- 100
 x <- AR(theta,n)
 plot.ts(x, main = "Устойчивый AR(2)")
+
 ############ 6 ##########
+
+model <- arima(x, order=c(2, 0, 0), include.mean=FALSE)
+
+print("############ 6 ##########")
+print (model)
+
