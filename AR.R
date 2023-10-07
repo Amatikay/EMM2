@@ -45,34 +45,24 @@ Estimation_MLE <- function(x) {
 }
 
 
-# Периодически возразает вектор не тета не приводящий к стац процессу. Не понимаю в чем пробелма.
-# Заменил на функцию ниже 
-#Generate_vector_theta_stationary <- function() {
-#  max_iterations <- 1000  
-# num_iterations <- 0     
-#  
-#  while (num_iterations < max_iterations) {
-#    theta_local <- c(rnorm(1), rnorm(1))
-#    roots <- polyroot(c(-theta_local[2], -theta_local[1], 1))
-#    
-#    if (all(abs(Re(roots)) < 1)) {
-#      return(theta_local)  
-#    }
-#    
-#    num_iterations <- num_iterations + 1
-#  }
-#  
-#  # Если не удалось найти устойчивый вектор theta
-#  return(c(0.5, -0.2))
-#}
+Generate_vector_theta_stationary <- function() { # размерность 2
+  max_iterations <- 1000
+  num_iterations <- 0
 
-# Не увиедл запрет в задании на использование чего то такого.
-Generate_vector_theta_stationary <- function() {
-  return(c(0.5, -0.2))
+ while (num_iterations < max_iterations) {
+   theta_local <- c(rnorm(1), rnorm(1))
+   roots <- polyroot(c(-theta_local[2], -theta_local[1], 1))
+
+   if (all(abs(roots)) < 1) {
+     return(theta_local)
+   }
+
+   num_iterations <- num_iterations + 1
+ }
+
+ # Если не удалось найти устойчивый вектор theta
+ return(c(0.5, -0.2))
 }
-
-
-
 
 #######################################################
 #                      Задания                        #
@@ -97,7 +87,7 @@ theta3 <- rnorm(1, mean=2, sd=1)
 
 # 1.1
 theta <- c(theta1)
-n<-100
+n<-1000
 x<- AR(theta,n)
 # png(filename="./AR_Plots/theta_lower_1.png")
 plot.ts(x, main = "thetha < 1")
@@ -105,7 +95,7 @@ plot.ts(x, main = "thetha < 1")
 
 # 1.2
 theta <- c(theta2)
-n <-100
+n <-1000
 x <- AR(theta,n)
 # png(filename="./AR_Plots/theta_equal_1.png")
 plot.ts(x, main = "thetha = 1")
@@ -114,7 +104,7 @@ plot.ts(x, main = "thetha = 1")
 # 1.3
 
 theta <- c(theta3)
-n <-100
+n <-1000
 x <- AR(theta,n)
 # png(filename="./AR_Plots/theta_upper_1.png")
 plot.ts(x, main = "thetha > 1")
@@ -123,7 +113,7 @@ plot.ts(x, main = "thetha > 1")
 ############ 2 ##########
 #Оценка МНК
 theta <- c(theta1)
-n <-100
+n <-1000
 x <- AR(theta,n)
 
 estimated_theta_mnk <- Estimation_MNK(x)
@@ -140,7 +130,7 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk))
 # В выводе оценки будут разные потому, что данные заново генерируются.
 #
 theta <- c(theta1)
-n <-100
+n <-1000
 x <- AR(theta,n)
 
 estimated_theta_mle <- Estimation_MLE(x)
@@ -162,16 +152,28 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk_by_
 
 #4.c
 
-estimated_theta_mnk_vector <- rep(NA,n)
-for (i in 11:n){
-  #Пусть первые 11 элементов вектора будут пустые
-  estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
+n <- 1000  # Задайте нужный объем выборки n
+estimated_theta_mnk_vector <- numeric(n)
+
+for (i in 11:n) {
+  # Оценивание по плывущему окну с шагом 1 элемент
+  estimated_theta_mnk_vector[i] <- Estimation_MNK(head(x, i))
 }
-estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
+
+# Удаление первых 10 пустых элементов
+estimated_theta_mnk_vector <- estimated_theta_mnk_vector[12:n]
+
+
+# estimated_theta_mnk_vector <- rep(NA,n)
+# for (i in 11:n){
+#   #Пусть первые 11 элементов вектора будут пустые
+#   estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
+# }
+# estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
 
 
 #png(filename="./AR_Plots/Estimation_MNK_from_11_to_1000.png")
-plot(x, type = 'b', main = "Динамика оценок от размера выборки", xlab = "I", ylab = "Estimation_MNK", pch = 1)
+plot(x, type = 'b', main = "Dynamics estimating theta", xlab = "I", ylab = "Estimation_MNK", pch = 1)
 # dev.off()
 
 ############ 5 ##########
@@ -181,9 +183,9 @@ print("############ 5 ##########")
 print("Theta vector:")
 print(theta)
 
-n <- 100
+n <- 1000
 x <- AR(theta,n)
-plot.ts(x, main = "Устойчивый AR(2)")
+plot.ts(x, main = "Stable AR(2)")
 
 ############ 6 ##########
 
