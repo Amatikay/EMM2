@@ -141,7 +141,7 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mle))
 
 #4.a
 
-theta <- theta1
+theta <- theta2
 n <- 1000
 x <- AR(theta,n)
 #4.b
@@ -152,28 +152,15 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk_by_
 
 #4.c
 
-n <- 1000  # Задайте нужный объем выборки n
 estimated_theta_mnk_vector <- numeric(n)
-
-for (i in 11:n) {
-  # Оценивание по плывущему окну с шагом 1 элемент
-  estimated_theta_mnk_vector[i] <- Estimation_MNK(head(x, i))
+for (i in 11:n){
+  #Пусть первые 11 элементов вектора будут пустые
+  estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
 }
-
-# Удаление первых 10 пустых элементов
-estimated_theta_mnk_vector <- estimated_theta_mnk_vector[12:n]
-
-
-# estimated_theta_mnk_vector <- rep(NA,n)
-# for (i in 11:n){
-#   #Пусть первые 11 элементов вектора будут пустые
-#   estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
-# }
-# estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
-
+estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
 
 #png(filename="./AR_Plots/Estimation_MNK_from_11_to_1000.png")
-plot(x, type = 'b', main = "Dynamics estimating theta", xlab = "I", ylab = "Estimation_MNK", pch = 1)
+plot(estimated_theta_mnk_vector, type = 'b', main = "Dynamics estimating theta", xlab = "I", ylab = "Estimation_MNK", pch = 1)
 # dev.off()
 
 ############ 5 ##########
