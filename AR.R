@@ -155,7 +155,7 @@ print(paste("Real theta: ", theta, " Estimated theta: ", estimated_theta_mnk_by_
 estimated_theta_mnk_vector <- numeric(n)
 for (i in 11:n){
   #Пусть первые 11 элементов вектора будут пустые
-  estimated_theta_mnk_vector[i]<-estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
+  estimated_theta_mnk_vector[i]<- estimated_theta_mnk_by_i_numbers <-Estimation_MNK(head(x,i))
 }
 estimated_theta_mnk_vector <- estimated_theta_mnk_vector[-c(1:11)]
 
